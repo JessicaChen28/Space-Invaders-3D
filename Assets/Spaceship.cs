@@ -10,6 +10,9 @@ public class Spaceship : MonoBehaviour
     public float lastShot = 0;
     public float speed = 10f;
 
+    public float minX = -16f;
+    public float maxX = 16f;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -18,22 +21,20 @@ public class Spaceship : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {
+    { 
+        Vector3 position = transform.position;
         if (Keyboard.current.rightArrowKey.isPressed)
         {
-            Vector3 position = transform.position;
             position.x += speed * Time.deltaTime;
-            transform.position = position;
         }
         if (Keyboard.current.leftArrowKey.isPressed)
         {
-            Vector3 position = transform.position;
             position.x -= speed * Time.deltaTime;
-            transform.position = position;
         }
+        position.x = Mathf.Clamp(position.x, minX, maxX);
+        transform.position = position;
         if (Keyboard.current.spaceKey.wasPressedThisFrame && Time.time - lastShot > shotCooldown)
         {
-            Vector3 position = transform.position;
             GameObject bullet = Instantiate<GameObject>(dartPrefab);
             bullet.transform.position = position;
             lastShot = Time.time;
