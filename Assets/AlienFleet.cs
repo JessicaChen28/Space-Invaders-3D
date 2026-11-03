@@ -1,106 +1,104 @@
 using UnityEngine;
 using System.Collections.Generic;
-using TMPro;
 
 public class AlienFleet : MonoBehaviour
 {
     [Header("Inscribed")]
     public GameObject alienPrefab;
     public AlienCounter alienCounter;
-    public TextMeshProUGUI gameOverText;   // drag your (inactive) "Game Over" TMP text here
 
-    [Header("Dynamic")]
-    public List<GameObject> aliens = new List<GameObject>();
+    public List<GameObject> aliens = new List<GameObject> { };
 
-    const int Columns = 10;
-    const int Rows = 3;
-    const float BaseSpeed = 0.1f;
-    const float MaxSpeedBoost = 1.5f;   // last alien moves at BaseSpeed * (1 + 1.5)
-    const float LeftBound = -16f;
-    const float RightBound = 16f;
-    const float DropDistance = 0.5f;
-    const float LoseY = 1f;             // TODO: set to just above your spaceship's Y position
-
-    int direction = 1;
-    int startingCount;
-    bool gameOver = false;
+    float baseSpeed = 0.1f; 
+    float speed = 0.1f;
+    float leftBound = -16f;
+    float rightBound = 16f;
+    float lowerBound = -6.83f; // Match your spaceship's exact Y position (-6.83)
+    float downTime = 0.1f;
+    bool movingDown = false;
+    int initialAlienCount = 30; 
 
     void Start()
     {
-        Time.timeScale = 1f;   // in case a previous game froze time
-        for (int i = 0; i < Columns; i++)
+        for (int i = 0; i < 10; i++)
         {
-            for (int j = 0; j < Rows; j++)
+            for (int j = 0; j < 3; j++)
             {
-                GameObject alien = Instantiate(alienPrefab);
+                GameObject alien = Instantiate<GameObject>(alienPrefab);
                 alien.transform.position = new Vector3(2 * i - 12, 10 - 2 * j, 0);
-                alien.GetComponent<Alien>().fleet = this;
                 aliens.Add(alien);
+                alien.GetComponent<Alien>().fleet = this;
             }
         }
-        startingCount = aliens.Count;
-        alienCounter.SetCount(aliens.Count);
+
+        initialAlienCount = aliens.Count;
+        baseSpeed = speed;
     }
 
-    public void RemoveAlien(GameObject alien)
+    void Update()
     {
-        aliens.Remove(alien);
-        alienCounter.SetCount(aliens.Count);
+        aliens.RemoveAll(alien => alien == null);
+
+        // Speed up remaining aliens as they get destroyed
+        if (initialAlienCount > 0 && aliens.Count > 0)
+        {
+            float proportionRemaining = (float)aliens.Count / initialAlienCount;
+            float speedMultiplier = Mathf.Lerp(2.5f, 1.0f, proportionRemaining);
+            float currentDirection = Mathf.Sign(speed);
+            speed = baseSpeed * speedMultiplier * currentDirection;
+        }
     }
 
     void FixedUpdate()
     {
-        if (gameOver) return;
-
-        if (aliens.Count == 0)
-        {
-            EndGame("YOU WIN!");
-            return;
-        }
-
-        float destroyedFraction = 1f - (float)aliens.Count / startingCount;
-        float speed = BaseSpeed * (1f + MaxSpeedBoost * destroyedFraction);
-
-        float left = Mathf.Infinity;
-        float right = Mathf.NegativeInfinity;
-        float lowest = Mathf.Infinity;
         foreach (GameObject alien in aliens)
         {
+            if (alien == null) continue;
+
             Vector3 position = alien.transform.position;
-            position.x += direction * speed;
-            alien.transform.position = position;
-
-            left = Mathf.Min(left, position.x);
-            right = Mathf.Max(right, position.x);
-            lowest = Mathf.Min(lowest, position.y);
-        }
-
-        if ((direction > 0 && right >= RightBound) || (direction < 0 && left <= LeftBound))
-        {
-            direction = -direction;
-            foreach (GameObject alien in aliens)
+            if (!movingDown)
             {
-                alien.transform.position += Vector3.down * DropDistance;
+                position.x += speed;
             }
-            lowest -= DropDistance;
+            else
+            {
+                position.y -= Mathf.Abs(speed);
+                
+                // Trigger game over when aliens reach the spaceship's level
+                if (position.y <= lowerBound)
+                {
+                    TriggerGameOver();
+                }
+            }
+            alien.transform.position = position;
         }
 
-        if (lowest <= LoseY)
+        float left = float.MaxValue, right = float.MinValue;
+        foreach (GameObject alien in aliens)
         {
-            EndGame("GAME OVER");
+            if (alien == null) continue;
+
+            Vector3 position = alien.transform.position;
+            if (position.x > right) right = position.x;
+            if (position.x < left) left = position.x;
+        }
+
+        if ((speed > 0 && right >= rightBound) || (speed < 0 && left <= leftBound))
+        {
+            speed = -speed;
+            movingDown = true;
+            Invoke("startSidewaysMotion", downTime);
         }
     }
 
-    // Single place where every win/loss ends up
-    public void EndGame(string message)
+    void startSidewaysMotion()
     {
-        if (gameOver) return;   // ignore repeat calls (e.g. bullet and alien hit in the same frame)
-        gameOver = true;
-        Time.timeScale = 0f;
-        if (gameOverText != null)
-        {
-            gameOverText.text = message;
-            gameOverText.gameObject.SetActive(true);
-        }
+        movingDown = false;
+    }
+
+    void TriggerGameOver()
+    {
+        Debug.Log("Game Over! Aliens reached the spaceship.");
+        Time.timeScale = 0f; 
     }
 }

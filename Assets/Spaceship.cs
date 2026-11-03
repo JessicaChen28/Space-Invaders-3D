@@ -6,32 +6,18 @@ public class Spaceship : MonoBehaviour
     [Header("Inscribed")]
     public GameObject dartPrefab;
 
-    public static float shotCooldown = .05f;
+    public static float shotCooldown = 0.05f;
     public float lastShot = 0;
     public float speed = 10f;
-
+    
+    [Header("Movement Boundaries")]
     public float minX = -16f;
     public float maxX = 16f;
 
-    public AlienFleet fleet;
-
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    void Hit()
-    {
-        fleet.EndGame("Game Over");
-        gameObject.SetActive(false);
-    }
-
-    // Update is called once per frame
     void Update()
-    { 
-        if(Time.timeScale == 0f) return;
+    {
         Vector3 position = transform.position;
+
         if (Keyboard.current.rightArrowKey.isPressed)
         {
             position.x += speed * Time.deltaTime;
@@ -40,17 +26,17 @@ public class Spaceship : MonoBehaviour
         {
             position.x -= speed * Time.deltaTime;
         }
+
+        // Clamp position securely
         position.x = Mathf.Clamp(position.x, minX, maxX);
         transform.position = position;
+
+        // Shooting logic
         if (Keyboard.current.spaceKey.wasPressedThisFrame && Time.time - lastShot > shotCooldown)
         {
             GameObject bullet = Instantiate<GameObject>(dartPrefab);
-            bullet.transform.position = position;
+            bullet.transform.position = transform.position;
             lastShot = Time.time;
         }
     }
-    
-
 }
-
-

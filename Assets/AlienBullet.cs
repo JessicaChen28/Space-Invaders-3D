@@ -2,15 +2,27 @@ using UnityEngine;
 
 public class AlienBullet : MonoBehaviour
 {
-    const float Speed = 0.1f;
-    const float KillY = -10f;
+    [Header("Inscribed")]
+
+    static float speed = .1f;
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+        
+    }
+
+    // Update is called once per frame
+    void Update()
+    {
+        
+    }
 
     void FixedUpdate()
     {
         Vector3 position = transform.position;
-        position.y -= Speed;
+        position.y -= speed;
         transform.position = position;
-        if (position.y < KillY)
+        if(position.y < -10)
         {
             Destroy(gameObject);
         }
@@ -18,14 +30,7 @@ public class AlienBullet : MonoBehaviour
 
     void OnCollisionEnter(Collision coll)
     {
-        if (coll.gameObject.TryGetComponent(out Spaceship ship))
-        {
-            Destroy(gameObject);
-        }
-        else
-        {
-            Destroy(gameObject);
-            Destroy(coll.gameObject);
-        }
+        Destroy(gameObject);
+        Destroy(coll.gameObject);
     }
 }
