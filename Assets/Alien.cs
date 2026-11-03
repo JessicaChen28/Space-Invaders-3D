@@ -3,40 +3,33 @@ using UnityEngine;
 public class Alien : MonoBehaviour
 {
     [Header("Inscribed")]
-
     public GameObject bulletPrefab;
-    public AlienFleet fleet;
-    
-    static float bulletSpawnRate = .002f;
-    public float lastShot = 0;
-    public static float shotCooldown = .1f;
+    public AlienFleet fleet;   // set by AlienFleet when it spawns this alien
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
+    const float BulletSpawnRate = 0.002f;
+    const float ShotCooldown = 0.1f;
 
-    // Update is called once per frame
-    void Update()
-    {
-        
-    }
+    float lastShot = 0f;
 
     void FixedUpdate()
     {
-        Vector3 position = transform.position;
-        
-        if(UnityEngine.Random.value < bulletSpawnRate && Time.time - lastShot > shotCooldown){
-            GameObject bullet = Instantiate<GameObject>(bulletPrefab);
-            bullet.transform.position = position;
+        if (Random.value < BulletSpawnRate && Time.time - lastShot > ShotCooldown)
+        {
+            Instantiate(bulletPrefab, transform.position, bulletPrefab.transform.rotation);
             lastShot = Time.time;
         }
     }
 
     void OnCollisionEnter(Collision coll)
     {
-        fleet.GetComponent<AlienFleet>().aliens.Remove(gameObject);
+        // An alien touching the ship is an immediate loss
+        if (coll.gameObject.TryGetComponent(out Spaceship _))
+        {
+            fleet.EndGame("GAME OVER");
+            return;
+        }
+
+        fleet.RemoveAlien(gameObject);
         Destroy(gameObject);
         Destroy(coll.gameObject);
     }

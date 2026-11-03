@@ -13,15 +13,24 @@ public class Spaceship : MonoBehaviour
     public float minX = -16f;
     public float maxX = 16f;
 
+    public AlienFleet fleet;
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         
     }
 
+    void Hit()
+    {
+        fleet.EndGame("Game Over");
+        gameObject.SetActive(false);
+    }
+
     // Update is called once per frame
     void Update()
     { 
+        if(Time.timeScale == 0f) return;
         Vector3 position = transform.position;
         if (Keyboard.current.rightArrowKey.isPressed)
         {
@@ -40,6 +49,7 @@ public class Spaceship : MonoBehaviour
             lastShot = Time.time;
         }
     }
+    
 
 }
 
