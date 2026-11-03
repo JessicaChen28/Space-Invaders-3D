@@ -4,7 +4,7 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - alienBulletPrefab: {fileID: 8055124704753309655, guid: 0c170ef3327b3c144882dc0720b92f6f, type: 3}
+  - alienBulletPrefab: {instanceID: 0}
   - fleet: {instanceID: 0}
   executionOrder: 0
   icon: {instanceID: 0}

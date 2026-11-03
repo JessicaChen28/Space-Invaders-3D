@@ -16,6 +16,7 @@ public class AlienFleet : MonoBehaviour
     float lowerBound = -6.83f; // Match your spaceship's exact Y position (-6.83)
     float downTime = 0.1f;
     bool movingDown = false;
+    int displayedCount = -1;
     int initialAlienCount = 30; 
 
     void Start()
@@ -32,18 +33,25 @@ public class AlienFleet : MonoBehaviour
         }
 
         initialAlienCount = aliens.Count;
-        baseSpeed = speed;
     }
 
     void Update()
     {
         aliens.RemoveAll(alien => alien == null);
 
+        if (alienCounter == null) alienCounter = FindFirstObjectByType<AlienCounter>();
+        if (alienCounter != null && aliens.Count != displayedCount)
+        {
+            displayedCount = aliens.Count;
+            alienCounter.SetCount(displayedCount);
+        }
+        baseSpeed = GameManager.BaseAlienSpeed; // easy/hard level
+
         // Speed up remaining aliens as they get destroyed
         if (initialAlienCount > 0 && aliens.Count > 0)
         {
             float proportionRemaining = (float)aliens.Count / initialAlienCount;
-            float speedMultiplier = Mathf.Lerp(2.5f, 1.0f, proportionRemaining);
+            float speedMultiplier = Mathf.Lerp(GameManager.MaxSpeedMultiplier, 1.0f, proportionRemaining);
             float currentDirection = Mathf.Sign(speed);
             speed = baseSpeed * speedMultiplier * currentDirection;
         }
@@ -67,7 +75,7 @@ public class AlienFleet : MonoBehaviour
                 // Trigger game over when aliens reach the spaceship's level
                 if (position.y <= lowerBound)
                 {
-                    TriggerGameOver();
+                    GameManager.GameOver();
                 }
             }
             alien.transform.position = position;
@@ -94,11 +102,5 @@ public class AlienFleet : MonoBehaviour
     void startSidewaysMotion()
     {
         movingDown = false;
-    }
-
-    void TriggerGameOver()
-    {
-        Debug.Log("Game Over! Aliens reached the spaceship.");
-        Time.timeScale = 0f; 
     }
 }

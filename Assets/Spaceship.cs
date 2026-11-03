@@ -16,6 +16,8 @@ public class Spaceship : MonoBehaviour
 
     void Update()
     {
+        if (GameManager.State != GameState.Playing) return;
+
         Vector3 position = transform.position;
 
         if (Keyboard.current.rightArrowKey.isPressed)

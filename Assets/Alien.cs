@@ -29,7 +29,7 @@ public class Alien : MonoBehaviour
 
     void SetRandomFireTime()
     {
-        nextFireTime = Time.time + Random.Range(fireRateMin, fireRateMax);
+        nextFireTime = Time.time + Random.Range(fireRateMin, fireRateMax) / GameManager.FireRateScale;
     }
 
     void FireBullet()
@@ -37,13 +37,22 @@ public class Alien : MonoBehaviour
         if (alienBulletPrefab != null)
         {
             // Instantiate the alien bullet at the alien's current position
-            Instantiate(alienBulletPrefab, transform.position, Quaternion.identity);
+            GameObject bullet = Instantiate(alienBulletPrefab, transform.position, Quaternion.identity);
+
+            // Bullets pass through aliens so they aren't pushed around or stopped by the fleet
+            Collider[] bulletColliders = bullet.GetComponentsInChildren<Collider>();
+            foreach (Alien other in FindObjectsByType<Alien>(FindObjectsSortMode.None))
+            {
+                foreach (Collider ac in other.GetComponentsInChildren<Collider>())
+                    foreach (Collider bc in bulletColliders)
+                        Physics.IgnoreCollision(ac, bc);
+            }
         }
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        if (collision.gameObject.CompareTag("Dart") || collision.gameObject.name.Contains("Dart"))
+        if (collision.gameObject.GetComponentInParent<Dart>() != null)
         {
             Destroy(gameObject);
             Destroy(collision.gameObject);

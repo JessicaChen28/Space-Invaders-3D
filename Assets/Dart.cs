@@ -17,6 +17,26 @@ public class Dart : MonoBehaviour
         
     }
 
+    // Darts destroy alien bullets (both objects disappear)
+    void OnCollisionEnter(Collision collision)
+    {
+        HitBullet(collision.gameObject);
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        HitBullet(other.gameObject);
+    }
+
+    void HitBullet(GameObject other)
+    {
+        if (other.GetComponentInParent<AlienBullet>() != null)
+        {
+            Destroy(other.GetComponentInParent<AlienBullet>().gameObject);
+            Destroy(gameObject);
+        }
+    }
+
     void FixedUpdate()
     {
         Vector3 position = transform.position;

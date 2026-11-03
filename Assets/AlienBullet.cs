@@ -4,6 +4,30 @@ public class AlienBullet : MonoBehaviour
 {
     public float speed = 8f;
 
+    void OnCollisionEnter(Collision collision)
+    {
+        HandleHit(collision.gameObject);
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        HandleHit(other.gameObject);
+    }
+
+    void HandleHit(GameObject other)
+    {
+        if (other.GetComponentInParent<Spaceship>() != null)
+        {
+            GameManager.PlayerHit();
+            Destroy(gameObject);
+        }
+        else if (other.GetComponentInParent<Dart>() != null)
+        {
+            Destroy(other.GetComponentInParent<Dart>().gameObject);
+            Destroy(gameObject);
+        }
+    }
+
     void Update()
     {
         // Move straight down toward the player's Y level (-6.83)
