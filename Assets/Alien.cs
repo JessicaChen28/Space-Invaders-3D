@@ -3,7 +3,7 @@ using UnityEngine;
 public class Alien : MonoBehaviour
 {
     [Header("Inscribed")]
-    public GameObject alienBulletPrefab; // Assign your AlienBullet prefab here in Inspector or instantiate via resources/fleet
+    public GameObject alienBulletPrefab; // Assign your AlienBullet prefab here in the Inspector
 
     [HideInInspector]
     public AlienFleet fleet;
@@ -14,13 +14,12 @@ public class Alien : MonoBehaviour
 
     void Start()
     {
-        // Set a random initial delay for each alien so they don't all fire at once
         SetRandomFireTime();
     }
 
     void Update()
     {
-        // Fire bullets at random intervals if the game isn't paused
+        // Fire bullets at random intervals
         if (Time.time >= nextFireTime)
         {
             FireBullet();
@@ -37,13 +36,13 @@ public class Alien : MonoBehaviour
     {
         if (alienBulletPrefab != null)
         {
-            GameObject bullet = Instantiate(alienBulletPrefab, transform.position, Quaternion.identity);
+            // Instantiate the alien bullet at the alien's current position
+            Instantiate(alienBulletPrefab, transform.position, Quaternion.identity);
         }
     }
 
     void OnCollisionEnter(Collision collision)
     {
-        // Check if hit by player's bullet (Dart)
         if (collision.gameObject.CompareTag("Dart") || collision.gameObject.name.Contains("Dart"))
         {
             Destroy(gameObject);

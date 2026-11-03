@@ -2,35 +2,17 @@ using UnityEngine;
 
 public class AlienBullet : MonoBehaviour
 {
-    [Header("Inscribed")]
+    public float speed = 8f;
 
-    static float speed = .1f;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
-    {
-        
-    }
-
-    // Update is called once per frame
     void Update()
     {
-        
-    }
+        // Move straight down toward the player's Y level (-6.83)
+        transform.Translate(Vector3.down * speed * Time.deltaTime);
 
-    void FixedUpdate()
-    {
-        Vector3 position = transform.position;
-        position.y -= speed;
-        transform.position = position;
-        if(position.y < -10)
+        // Clean up bullet if it goes off-screen below the player
+        if (transform.position.y < -10f)
         {
             Destroy(gameObject);
         }
-    }
-
-    void OnCollisionEnter(Collision coll)
-    {
-        Destroy(gameObject);
-        Destroy(coll.gameObject);
     }
 }

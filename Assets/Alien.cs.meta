@@ -1,2 +1,13 @@
 fileFormatVersion: 2
 guid: 2828ea1b0243e984d8e3d1e0bc020a2f
+MonoImporter:
+  externalObjects: {}
+  serializedVersion: 2
+  defaultReferences:
+  - alienBulletPrefab: {fileID: 8055124704753309655, guid: 0c170ef3327b3c144882dc0720b92f6f, type: 3}
+  - fleet: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

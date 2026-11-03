@@ -126,8 +126,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2828ea1b0243e984d8e3d1e0bc020a2f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  bulletPrefab: {fileID: 8055124704753309655, guid: 0c170ef3327b3c144882dc0720b92f6f, type: 3}
-  lastShot: 0
+  alienBulletPrefab: {fileID: 8055124704753309655, guid: 0c170ef3327b3c144882dc0720b92f6f, type: 3}
+  fleet: {fileID: 0}
+  fireRateMin: 2
+  fireRateMax: 5
 --- !u!54 &-7438394647616666093
 Rigidbody:
   m_ObjectHideFlags: 0
