@@ -2,7 +2,7 @@ using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.SceneManagement;
 
-public enum GameState { Start, Playing, GameOver }
+public enum GameState { Start, Playing, GameOver, Won }
 
 // Creates itself at runtime, so it needs no scene setup.
 public class GameManager : MonoBehaviour
@@ -13,9 +13,9 @@ public class GameManager : MonoBehaviour
 
     const int EasyShield = 5;
 
-    public static float BaseAlienSpeed { get { return Hard ? 0.2f : 0.1f; } }
-    public static float MaxSpeedMultiplier { get { return Hard ? 3.5f : 2.5f; } }
-    public static float FireRateScale { get { return Hard ? 2f : 0.5f; } }
+    public static float BaseAlienSpeed { get { return Hard ? 0.10f : 0.1f; } }
+    public static float MaxSpeedMultiplier { get { return Hard ? 3f : 2.5f; } }
+    public static float FireRateScale { get { return Hard ? 1.5f : 0.5f; } }
 
     public static int Shield = EasyShield;
 
@@ -69,6 +69,13 @@ public class GameManager : MonoBehaviour
         Time.timeScale = 0f;
     }
 
+    public static void Win()
+    {
+        if (State != GameState.Playing) return;
+        State = GameState.Won;
+        Time.timeScale = 0f;
+    }
+
     // Called when an alien bullet hits the spaceship
     public static void PlayerHit()
     {
@@ -87,7 +94,7 @@ public class GameManager : MonoBehaviour
             if (kb.digit1Key.wasPressedThisFrame) StartGame(false);
             if (kb.digit2Key.wasPressedThisFrame) StartGame(true);
         }
-        else if (State == GameState.GameOver && kb.rKey.wasPressedThisFrame)
+        else if ((State == GameState.GameOver || State == GameState.Won) && kb.rKey.wasPressedThisFrame)
         {
             SceneManager.LoadScene(SceneManager.GetActiveScene().buildIndex);
         }
@@ -138,7 +145,8 @@ public class GameManager : MonoBehaviour
         GUI.DrawTexture(new Rect(0, 0, w, h), Texture2D.whiteTexture);
         GUI.color = old;
 
-        GUI.Label(new Rect(0, 0, w, h), "GAME OVER", Style(Mathf.RoundToInt(h * 0.12f), Color.red));
+        bool won = State == GameState.Won;
+        GUI.Label(new Rect(0, 0, w, h), won ? "YOU WIN!" : "GAME OVER", Style(Mathf.RoundToInt(h * 0.12f), won ? Color.green : Color.red));
         GUI.Label(new Rect(0, h * 0.62f, w, h * 0.08f), "Press R to return to the start screen", Style(Mathf.RoundToInt(h * 0.035f), Color.white));
     }
 }

@@ -47,6 +47,12 @@ public class AlienFleet : MonoBehaviour
         }
         baseSpeed = GameManager.BaseAlienSpeed; // easy/hard level
 
+        if (initialAlienCount > 0 && aliens.Count == 0)
+        {
+            GameManager.Win();
+            return;
+        }
+
         // Speed up remaining aliens as they get destroyed
         if (initialAlienCount > 0 && aliens.Count > 0)
         {

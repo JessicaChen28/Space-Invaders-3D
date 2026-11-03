@@ -14,6 +14,28 @@ public class Spaceship : MonoBehaviour
     public float minX = -16f;
     public float maxX = 16f;
 
+    Quaternion startRotation;
+    Rigidbody body;
+
+    void Start()
+    {
+        startRotation = transform.rotation;
+        body = GetComponent<Rigidbody>();
+    }
+
+    // Easy mode: bullet hits must not knock the ship over, so keep it upright
+    void LateUpdate()
+    {
+        if (GameManager.Hard) return;
+
+        if (body != null)
+        {
+            body.constraints = RigidbodyConstraints.FreezeRotation;
+            body.angularVelocity = Vector3.zero;
+        }
+        transform.rotation = startRotation;
+    }
+
     void Update()
     {
         if (GameManager.State != GameState.Playing) return;
